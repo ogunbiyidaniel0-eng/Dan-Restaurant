@@ -1,0 +1,213 @@
+.order-confirmation-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 60px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(181, 138, 36, 0.12),
+      transparent 38%
+    ),
+    #f4eee3;
+  color: #17140f;
+}
+
+.order-confirmation-card {
+  width: min(620px, 100%);
+  padding: 55px 50px;
+  border: 1px solid #e1d8ca;
+  border-radius: 22px;
+  background: #fffaf2;
+  text-align: center;
+  box-shadow: 0 25px 70px rgba(35, 29, 20, 0.1);
+}
+
+.order-confirmation-icon {
+  width: 76px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 25px;
+  border-radius: 50%;
+  background: #b58a24;
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 800;
+  box-shadow: 0 12px 30px rgba(181, 138, 36, 0.25);
+}
+
+.order-confirmation-eyebrow {
+  margin: 0 0 12px;
+  color: #b58a24;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.order-confirmation-title {
+  margin: 0;
+  color: #17140f;
+  font-size: clamp(36px, 6vw, 54px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
+
+.order-confirmation-message {
+  max-width: 500px;
+  margin: 22px auto 0;
+  color: #777067;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.order-confirmation-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 32px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 8px;
+  background: #b58a24;
+  color: #ffffff;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.order-confirmation-button:hover {
+  background: #c49a35;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(181, 138, 36, 0.2);
+}
+
+.order-confirmation-button:active {
+  transform: translateY(0);
+}
+
+.order-confirmation-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  box-sizing: border-box;
+  background: #f4eee3;
+  color: #17140f;
+  text-align: center;
+}
+
+.order-confirmation-loading-card {
+  width: min(500px, 100%);
+  padding: 45px 35px;
+  border: 1px solid #e1d8ca;
+  border-radius: 20px;
+  background: #fffaf2;
+  box-shadow: 0 20px 55px rgba(35, 29, 20, 0.08);
+}
+
+.order-confirmation-loading-card h1 {
+  margin: 0 0 12px;
+  color: #17140f;
+  font-size: 28px;
+}
+
+.order-confirmation-loading-card p {
+  margin: 0;
+  color: #777067;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.order-confirmation-error {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 60px;
+  box-sizing: border-box;
+  background: #f4eee3;
+}
+
+.order-confirmation-error-card {
+  width: min(580px, 100%);
+  padding: 50px 45px;
+  border: 1px solid #dbc8c0;
+  border-radius: 22px;
+  background: #fffaf2;
+  text-align: center;
+  box-shadow: 0 20px 55px rgba(35, 29, 20, 0.08);
+}
+
+.order-confirmation-error-icon {
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  background: #8a5045;
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.order-confirmation-error-card h1 {
+  margin: 0;
+  color: #17140f;
+  font-size: 36px;
+  line-height: 1.1;
+}
+
+.order-confirmation-error-card p {
+  margin: 18px auto 0;
+  color: #777067;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+  .order-confirmation-page {
+    padding: 80px 18px 40px;
+  }
+
+  .order-confirmation-card {
+    padding: 42px 25px;
+    border-radius: 18px;
+  }
+
+  .order-confirmation-icon {
+    width: 68px;
+    height: 68px;
+    font-size: 30px;
+  }
+
+  .order-confirmation-title {
+    font-size: 38px;
+    letter-spacing: -1.5px;
+  }
+
+  .order-confirmation-message {
+    font-size: 14px;
+  }
+
+  .order-confirmation-error {
+    padding: 80px 18px 40px;
+  }
+
+  .order-confirmation-error-card {
+    padding: 40px 25px;
+  }
+}

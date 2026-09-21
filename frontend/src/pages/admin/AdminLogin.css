@@ -1,0 +1,142 @@
+.admin-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 20px;
+
+  background: #17130f;
+  color: #f5ead7;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 440px;
+
+  padding: 45px;
+
+  background: #211b15;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 20px;
+
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+}
+
+.admin-login-eyebrow {
+  margin-bottom: 12px;
+
+  color: #d4af37;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.admin-login-card h1 {
+  margin-bottom: 10px;
+
+  font-size: 2.5rem;
+  line-height: 1.1;
+}
+
+.admin-login-subtitle {
+  margin-bottom: 35px;
+
+  color: #bfb3a1;
+  line-height: 1.6;
+}
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+
+  color: #f5ead7;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px 16px;
+
+  border: 1px solid rgba(245, 234, 215, 0.15);
+  border-radius: 10px;
+  outline: none;
+
+  background: #17130f;
+  color: #f5ead7;
+
+  font-size: 0.95rem;
+
+  transition: border-color 0.3s ease;
+}
+
+.form-group input::placeholder {
+  color: #756c60;
+}
+
+.form-group input:focus {
+  border-color: #d4af37;
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px;
+
+  margin-top: 8px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #d4af37;
+  color: #17130f;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
+}
+
+.forgot-password {
+  display: block;
+  margin-top: 22px;
+
+  text-align: center;
+
+  color: #d4af37;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+.login-error {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+
+  border: 1px solid rgba(220, 80, 80, 0.3);
+  border-radius: 8px;
+
+  background: rgba(220, 80, 80, 0.08);
+  color: #e89b9b;
+
+  font-size: 0.9rem;
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
