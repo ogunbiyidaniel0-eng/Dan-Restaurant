@@ -21,7 +21,8 @@ function Navbar() {
 
         <button
           className="cart-button"
-          onClick={() => setCartOpen(true)}
+          onClick={() => setCartOpen(!cartOpen)}
+          
         >
           🛒 Cart
 
