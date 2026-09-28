@@ -1,17 +1,16 @@
 .navbar {
   width: 100%;
-  height: 80px;
+  min-height: 80px;
   padding: 0 6%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   background: #17130f;
   border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-
   position: sticky;
   top: 0;
   z-index: 1000;
+  box-sizing: border-box;
 }
 
 .navbar-brand {
@@ -19,18 +18,21 @@
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.5px;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 2.5rem;
+  gap: 2rem;
 }
 
 .navbar-links a {
   color: #f5ead7;
   text-decoration: none;
   font-size: 0.95rem;
+  white-space: nowrap;
   transition: color 0.3s ease;
 }
 
@@ -42,13 +44,11 @@
   border: 1px solid #d4af37;
   background: transparent;
   color: #d4af37;
-
-  padding: 10px 18px;
+  padding: 9px 16px;
   border-radius: 999px;
-
   font-size: 0.9rem;
   cursor: pointer;
-
+  white-space: nowrap;
   transition: all 0.3s ease;
 }
 
@@ -57,3 +57,118 @@
   color: #17130f;
 }
 
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+  .navbar {
+    padding: 0 4%;
+  }
+
+  .navbar-links {
+    gap: 1.2rem;
+  }
+
+  .navbar-links a {
+    font-size: 0.88rem;
+  }
+
+  .cart-button {
+    padding: 8px 13px;
+    font-size: 0.85rem;
+  }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+  .navbar {
+    min-height: 70px;
+    padding: 0 20px;
+  }
+
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+
+  .navbar-links {
+    gap: 0.8rem;
+  }
+
+  .navbar-links a {
+    font-size: 0.78rem;
+  }
+
+  .cart-button {
+    padding: 7px 11px;
+    font-size: 0.78rem;
+  }
+}
+
+
+/* =========================
+   SMALL PHONES
+========================= */
+
+@media (max-width: 550px) {
+  .navbar {
+    padding: 12px 16px;
+    min-height: auto;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  .navbar-links {
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+    order: 3;
+    padding-bottom: 5px;
+  }
+
+  .navbar-links a {
+    font-size: 0.8rem;
+  }
+
+  .cart-button {
+    font-size: 0.78rem;
+    padding: 7px 12px;
+  }
+}
+
+
+/* =========================
+   VERY SMALL PHONES
+========================= */
+
+@media (max-width: 380px) {
+  .navbar {
+    padding: 10px 12px;
+  }
+
+  .navbar-brand {
+    font-size: 1.05rem;
+  }
+
+  .navbar-links {
+    gap: 0.65rem;
+  }
+
+  .navbar-links a {
+    font-size: 0.72rem;
+  }
+
+  .cart-button {
+    padding: 6px 9px;
+    font-size: 0.7rem;
+  }
+}
