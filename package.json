@@ -1,0 +1,12 @@
+{
+  "name": "restaurant-ordering-system",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "install:backend": "npm install --prefix backend",
+    "install:frontend": "npm install --prefix frontend",
+    "build:frontend": "npm --prefix frontend run build",
+    "build": "npm run install:backend && npm run install:frontend && npm run build:frontend",
+    "start": "cd backend && NODE_ENV=production node server.js"
+  }
+}
