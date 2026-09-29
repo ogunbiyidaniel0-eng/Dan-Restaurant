@@ -1,20 +1,19 @@
 const nodemailer = require("nodemailer");
 
+// Switch to Port 465 (SSL) to bypass Render's port 587 block
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
+  port: 465,
+  secure: true, // Set to true since we are explicitly using port 465
   family: 4,
-
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
+  // Set explicit, lower timeout values so the system fails fast if the network drops
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 const sendEmail = async ({ to, subject, html }) => {
