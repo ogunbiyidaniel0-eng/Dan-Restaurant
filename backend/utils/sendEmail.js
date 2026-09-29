@@ -1,36 +1,28 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require('resend');
 
-// Switch to Port 465 (SSL) to bypass Render's port 587 block
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Set to true since we are explicitly using port 465
-  family: 4,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  // Set explicit, lower timeout values so the system fails fast if the network drops
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
+// Initialize Resend using your secret key over secure HTTPS (Port 443)
+// Render never blocks this traffic!
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"Dan Restaurant" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
+    // Note: If you are using a free tier without a verified domain,
+    // your "from" address MUST be 'onboarding@resend.dev'
+    const response = await resend.emails.send({
+      from: 'Dan Restaurant <onboarding@resend.dev>',
+      to: [to],
+      subject: subject,
+      html: html,
     });
 
-    console.log(`Email sent successfully to: ${to}`);
-    console.log(`Email message ID: ${info.messageId}`);
+    if (response.error) {
+      throw new Error(response.error.message || JSON.stringify(response.error));
+    }
 
-    return info;
+    console.log(`Email sent successfully via Resend. Message ID: ${response.data.id}`);
+    return response.data;
   } catch (error) {
-    console.error(`Email sending failed to ${to}:`, error.message);
+    console.error(`Resend API email failed to ${to}:`, error.message);
     throw error;
   }
 };
