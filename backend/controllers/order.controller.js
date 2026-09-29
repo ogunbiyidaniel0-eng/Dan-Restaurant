@@ -163,6 +163,8 @@ const verifyPayment = async (req, res) => {
       });
     }
 
+    // If payment was already verified,
+    // simply return the paid order.
     if (order.paymentStatus === "Paid") {
       return res.status(200).json({
         message: "Order already confirmed as paid",
@@ -187,13 +189,15 @@ const verifyPayment = async (req, res) => {
 
     const transaction = response.data.data;
 
+    // Verify status, amount and currency
     const isVerified =
       transaction.status === "successful" &&
-      transaction.amount === order.totalPrice &&
+      Number(transaction.amount) === Number(order.totalPrice) &&
       transaction.currency === "NGN";
 
     if (!isVerified) {
       order.paymentStatus = "Failed";
+
       await order.save();
 
       return res.status(400).json({
@@ -202,90 +206,157 @@ const verifyPayment = async (req, res) => {
       });
     }
 
+    // -----------------------------------------
+    // PAYMENT SUCCESSFULLY VERIFIED
+    // -----------------------------------------
+
     order.paymentStatus = "Paid";
 
+    // Order number should already exist because
+    // it is created when the order is created.
     if (!order.orderNumber) {
       order.orderNumber = await generateOrderNumber();
     }
 
     await order.save();
 
-    // Email customer
-    await sendEmail({
-      to: order.guestEmail,
-      subject: "Your order has been confirmed!",
-      html: `
-        <h2>Thanks for your order, ${order.guestName}!</h2>
-
-        <p>We've received your payment and your order is being processed.</p>
-
-        <p>
-          <strong>Order ID:</strong> ${order.orderNumber}
-        </p>
-
-        <p>
-          <strong>Order total:</strong> ₦${order.totalPrice}
-        </p>
-
-        <p>
-          <strong>Delivery address:</strong> ${order.deliveryAddress}
-        </p>
-
-        <p>
-          We'll keep you posted as your order moves through the kitchen.
-        </p>
-      `,
-    });
-
-    // Email admin
-    const admin = await Admin.findOne();
-
-    if (admin) {
-      await sendEmail({
-        to: admin.email,
-        subject: "New order received!",
-        html: `
-          <h2>New order from ${order.guestName}</h2>
-
-          <p>
-            <strong>Order ID:</strong> ${order.orderNumber}
-          </p>
-
-          <p>
-            <strong>Total:</strong> ₦${order.totalPrice}
-          </p>
-
-          <p>
-            <strong>Phone:</strong> ${order.guestPhone}
-          </p>
-
-          <p>
-            <strong>Delivery address:</strong> ${order.deliveryAddress}
-          </p>
-
-          <p>
-            Log in to the admin dashboard to view full details
-            and start preparing it.
-          </p>
-        `,
-      });
-    }
-
-    req.app.get("io").emit("orderPaid", order);
+    // -----------------------------------------
+    // RETURN SUCCESS TO FRONTEND IMMEDIATELY
+    // -----------------------------------------
 
     res.status(200).json({
       message: "Payment verified successfully",
       order,
     });
+
+    // -----------------------------------------
+    // SEND EMAILS AFTER PAYMENT IS CONFIRMED
+    // -----------------------------------------
+
+    try {
+      await sendEmail({
+        to: order.guestEmail,
+        subject: "Your Dan Restaurant Order is Confirmed!",
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2>Thanks for your order, ${order.guestName}!</h2>
+
+            <p>
+              We've received your payment and your order
+              is now being processed.
+            </p>
+
+            <p>
+              <strong>Order ID:</strong>
+              ${order.orderNumber}
+            </p>
+
+            <p>
+              <strong>Order Total:</strong>
+              ₦${order.totalPrice}
+            </p>
+
+            <p>
+              <strong>Delivery Address:</strong>
+              ${order.deliveryAddress}
+            </p>
+
+            <p>
+              You can use your Order ID to track your
+              order on Dan Restaurant.
+            </p>
+
+            <p>
+              We'll keep you updated as your order
+              moves through the kitchen.
+            </p>
+          </div>
+        `,
+      });
+
+      console.log(
+        `Customer confirmation email sent for ${order.orderNumber}`
+      );
+    } catch (emailError) {
+      console.error(
+        "Customer confirmation email failed:",
+        emailError.message
+      );
+    }
+
+    // -----------------------------------------
+    // ADMIN EMAIL
+    // -----------------------------------------
+
+    try {
+      const admin = await Admin.findOne();
+
+      if (admin) {
+        await sendEmail({
+          to: admin.email,
+          subject: "New Dan Restaurant Order!",
+          html: `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+              <h2>New order from ${order.guestName}</h2>
+
+              <p>
+                <strong>Order ID:</strong>
+                ${order.orderNumber}
+              </p>
+
+              <p>
+                <strong>Total:</strong>
+                ₦${order.totalPrice}
+              </p>
+
+              <p>
+                <strong>Phone:</strong>
+                ${order.guestPhone}
+              </p>
+
+              <p>
+                <strong>Delivery Address:</strong>
+                ${order.deliveryAddress}
+              </p>
+
+              <p>
+                Log in to the admin dashboard to view
+                the full order and start preparing it.
+              </p>
+            </div>
+          `,
+        });
+
+        console.log(
+          `Admin order email sent for ${order.orderNumber}`
+        );
+      }
+    } catch (emailError) {
+      console.error(
+        "Admin notification email failed:",
+        emailError.message
+      );
+    }
+
+    // -----------------------------------------
+    // REAL-TIME ADMIN NOTIFICATION
+    // -----------------------------------------
+
+    req.app.get("io").emit("orderPaid", order);
   } catch (error) {
     console.error(
       "Verify Payment Error:",
       error.response?.data || error.message
     );
 
-    res.status(500).json({
-      error: "Failed to verify payment",
-    });
+    // Important:
+    // Do not send a 500 response if the response
+    // was already sent after successful verification.
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: "Failed to verify payment",
+      });
+    }
   }
 };
 

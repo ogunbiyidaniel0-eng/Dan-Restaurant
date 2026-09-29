@@ -15,17 +15,19 @@ function OrderConfirmation() {
 
   useEffect(() => {
     let mounted = true;
+    let redirectTimer;
 
     const verifyOrderPayment = async () => {
       const paymentStatus = searchParams.get("status");
       const txRef = searchParams.get("tx_ref");
 
+      console.log("Flutterwave payment status:", paymentStatus);
+      console.log("Flutterwave tx_ref:", txRef);
+
       if (!txRef) {
         if (mounted) {
           setStatus("error");
-          setMessage(
-            "Payment information was not found."
-          );
+          setMessage("Payment information was not found.");
         }
         return;
       }
@@ -36,51 +38,55 @@ function OrderConfirmation() {
         .replace(/^ORDER-/, "")
         .replace(/-\d+$/, "");
 
-      // If Flutterwave did not report a successful payment,
-      // don't attempt to mark the order as paid.
+      console.log("Order ID:", orderId);
+
       if (paymentStatus !== "successful") {
         if (mounted) {
           setStatus("error");
-          setMessage(
-            "Your payment was not completed."
-          );
+          setMessage("Your payment was not completed.");
         }
         return;
       }
 
       try {
-        const result =
-          await api.verifyPayment(orderId);
+        // Verify payment with our backend
+        const result = await api.verifyPayment(orderId);
 
-        console.log(
-          "Payment verification result:",
-          result
-        );
+        console.log("Payment verification result:", result);
 
         if (
-          mounted &&
-          result.order?.paymentStatus === "Paid"
+          result?.order?.paymentStatus === "Paid" &&
+          result?.order?.orderNumber
         ) {
+          if (!mounted) return;
+
           setOrderNumber(result.order.orderNumber);
+
           clearCart();
+
+          // Show success immediately
           setStatus("success");
-        } else if (mounted) {
-          setStatus("error");
-          setMessage(
-            "We could not confirm your payment."
-          );
+
+          // Redirect to homepage after 3 seconds
+          redirectTimer = setTimeout(() => {
+            navigate("/");
+          }, 3000);
+        } else {
+          if (mounted) {
+            setStatus("error");
+            setMessage(
+              "We could not confirm your payment. Please contact us if money was deducted."
+            );
+          }
         }
       } catch (error) {
-        console.error(
-          "Payment verification error:",
-          error
-        );
+        console.error("Payment verification error:", error);
 
         if (mounted) {
           setStatus("error");
           setMessage(
             error.message ||
-              "We could not verify your payment."
+              "We could not verify your payment. Please contact us if money was deducted."
           );
         }
       }
@@ -90,8 +96,12 @@ function OrderConfirmation() {
 
     return () => {
       mounted = false;
+
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+      }
     };
-  }, [searchParams, clearCart]);
+  }, [searchParams, clearCart, navigate]);
 
   if (status === "verifying") {
     return (
@@ -105,13 +115,11 @@ function OrderConfirmation() {
             PROCESSING PAYMENT
           </p>
 
-          <h1>
-            Confirming your payment...
-          </h1>
+          <h1>Confirming your payment...</h1>
 
           <p className="order-confirmation-message">
-            Please wait while we confirm your
-            payment with Flutterwave.
+            Please wait while we confirm your payment
+            with Flutterwave.
           </p>
         </div>
       </div>
@@ -130,9 +138,7 @@ function OrderConfirmation() {
             PAYMENT STATUS
           </p>
 
-          <h1>
-            Payment could not be confirmed
-          </h1>
+          <h1>Payment could not be confirmed</h1>
 
           <p className="order-confirmation-message">
             {message}
@@ -160,18 +166,17 @@ function OrderConfirmation() {
           ORDER CONFIRMED
         </p>
 
-        <h1>
-          Payment Successful!
-        </h1>
+        <h1>Payment Successful!</h1>
 
         <p className="order-confirmation-message">
-          Thank you for your order. Your payment
-          has been received and your meal is now
-          being prepared.
+          Thank you for your order. Your payment has
+          been received and your meal is now being
+          prepared.
         </p>
 
         <p className="order-confirmation-note">
-          Your Order ID: <strong>{orderNumber}</strong>
+          Your Order ID:{" "}
+          <strong>{orderNumber}</strong>
         </p>
 
         <div className="order-confirmation-divider"></div>
@@ -180,9 +185,19 @@ function OrderConfirmation() {
           Save this ID to track your order anytime.
         </p>
 
+        <p className="order-confirmation-note">
+          Redirecting you to the home page...
+        </p>
+
         <button
           className="order-confirmation-button"
-          onClick={() => navigate(`/track-order?orderNumber=${encodeURIComponent(orderNumber)}`)}
+          onClick={() =>
+            navigate(
+              `/track-order?orderNumber=${encodeURIComponent(
+                orderNumber
+              )}`
+            )
+          }
         >
           Track Your Order
         </button>
