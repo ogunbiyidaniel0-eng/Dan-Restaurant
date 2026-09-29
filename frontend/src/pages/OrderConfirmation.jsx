@@ -67,9 +67,9 @@ function OrderConfirmation() {
           // Show success immediately
           setStatus("success");
 
-          // Redirect to homepage after 3 seconds
+          // Automatically redirect to homepage after 3 seconds
           redirectTimer = setTimeout(() => {
-            navigate("/");
+            window.location.href = "/";
           }, 3000);
         } else {
           if (mounted) {
@@ -101,7 +101,7 @@ function OrderConfirmation() {
         clearTimeout(redirectTimer);
       }
     };
-  }, [searchParams, clearCart, navigate]);
+  }, [searchParams, clearCart]);
 
   if (status === "verifying") {
     return (
