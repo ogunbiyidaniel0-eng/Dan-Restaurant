@@ -13,9 +13,11 @@ function OrderConfirmation() {
   const [message, setMessage] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
 
+  // -----------------------------------------
+  // VERIFY PAYMENT
+  // -----------------------------------------
   useEffect(() => {
     let mounted = true;
-    let redirectTimer;
 
     const verifyOrderPayment = async () => {
       const paymentStatus = searchParams.get("status");
@@ -49,7 +51,6 @@ function OrderConfirmation() {
       }
 
       try {
-        // Verify payment with our backend
         const result = await api.verifyPayment(orderId);
 
         console.log("Payment verification result:", result);
@@ -64,13 +65,8 @@ function OrderConfirmation() {
 
           clearCart();
 
-          // Show success immediately
+          // Payment is successfully confirmed
           setStatus("success");
-
-          // Automatically redirect to homepage after 3 seconds
-          redirectTimer = setTimeout(() => {
-            window.location.href = "/";
-          }, 3000);
         } else {
           if (mounted) {
             setStatus("error");
@@ -96,13 +92,34 @@ function OrderConfirmation() {
 
     return () => {
       mounted = false;
-
-      if (redirectTimer) {
-        clearTimeout(redirectTimer);
-      }
     };
   }, [searchParams, clearCart]);
 
+  // -----------------------------------------
+  // AUTOMATIC REDIRECT
+  // -----------------------------------------
+  useEffect(() => {
+    if (status !== "success") {
+      return;
+    }
+
+    console.log("SUCCESS SCREEN SHOWN");
+    console.log("Redirecting to homepage in 3 seconds...");
+
+    const timer = setTimeout(() => {
+      console.log("REDIRECTING NOW");
+
+      window.location.replace("/");
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [status]);
+
+  // -----------------------------------------
+  // VERIFYING SCREEN
+  // -----------------------------------------
   if (status === "verifying") {
     return (
       <div className="order-confirmation-page">
@@ -126,6 +143,9 @@ function OrderConfirmation() {
     );
   }
 
+  // -----------------------------------------
+  // ERROR SCREEN
+  // -----------------------------------------
   if (status === "error") {
     return (
       <div className="order-confirmation-page">
@@ -155,6 +175,9 @@ function OrderConfirmation() {
     );
   }
 
+  // -----------------------------------------
+  // SUCCESS SCREEN
+  // -----------------------------------------
   return (
     <div className="order-confirmation-page">
       <div className="order-confirmation-card">
