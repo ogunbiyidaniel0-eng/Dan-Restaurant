@@ -21,6 +21,7 @@ const signup = async (req, res) => {
     }
 
     const existingAdmin = await Admin.findOne();
+
     if (existingAdmin) {
       return res.status(400).json({
         error: "Admin account already exists",
@@ -46,7 +47,10 @@ const signup = async (req, res) => {
     });
   } catch (error) {
     console.error("Signup Error:", error.message);
-    res.status(500).json({ error: "Server error" });
+
+    res.status(500).json({
+      error: "Server error",
+    });
   }
 };
 
@@ -60,7 +64,9 @@ const login = async (req, res) => {
       });
     }
 
-    const admin = await Admin.findOne({ email: email.toLowerCase().trim() });
+    const admin = await Admin.findOne({
+      email: email.toLowerCase().trim(),
+    });
 
     if (!admin) {
       return res.status(401).json({
@@ -78,10 +84,11 @@ const login = async (req, res) => {
 
     const token = generateToken(admin._id);
 
+    // Authentication cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -95,13 +102,23 @@ const login = async (req, res) => {
     });
   } catch (error) {
     console.error("Login Error:", error.message);
-    res.status(500).json({ error: "Server error" });
+
+    res.status(500).json({
+      error: "Server error",
+    });
   }
 };
 
 const logout = (req, res) => {
-  res.clearCookie("token");
-  res.status(200).json({ message: "Logged out successfully" });
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+
+  res.status(200).json({
+    message: "Logged out successfully",
+  });
 };
 
 const getMe = async (req, res) => {
@@ -119,14 +136,19 @@ const forgotPassword = async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({ error: "Email is required" });
+      return res.status(400).json({
+        error: "Email is required",
+      });
     }
 
-    const admin = await Admin.findOne({ email: email.toLowerCase().trim() });
+    const admin = await Admin.findOne({
+      email: email.toLowerCase().trim(),
+    });
 
     if (!admin) {
       return res.status(200).json({
-        message: "If that email is registered, a reset link has been sent.",
+        message:
+          "If that email is registered, a reset link has been sent.",
       });
     }
 
@@ -134,6 +156,7 @@ const forgotPassword = async (req, res) => {
 
     admin.resetToken = resetToken;
     admin.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
+
     await admin.save();
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
@@ -143,18 +166,32 @@ const forgotPassword = async (req, res) => {
       subject: "Password Reset Request",
       html: `
         <p>You requested a password reset.</p>
-        <p>Click the link below to set a new password. This link expires in 15 minutes.</p>
-        <a href="${resetUrl}">${resetUrl}</a>
-        <p>If you didn't request this, you can safely ignore this email.</p>
+
+        <p>
+          Click the link below to set a new password.
+          This link expires in 15 minutes.
+        </p>
+
+        <a href="${resetUrl}">
+          ${resetUrl}
+        </a>
+
+        <p>
+          If you didn't request this, you can safely ignore this email.
+        </p>
       `,
     });
 
     res.status(200).json({
-      message: "If that email is registered, a reset link has been sent.",
+      message:
+        "If that email is registered, a reset link has been sent.",
     });
   } catch (error) {
     console.error("Forgot Password Error:", error.message);
-    res.status(500).json({ error: "Server error" });
+
+    res.status(500).json({
+      error: "Server error",
+    });
   }
 };
 
@@ -164,12 +201,16 @@ const resetPassword = async (req, res) => {
     const { password } = req.body;
 
     if (!password) {
-      return res.status(400).json({ error: "New password is required" });
+      return res.status(400).json({
+        error: "New password is required",
+      });
     }
 
     const admin = await Admin.findOne({
       resetToken: token,
-      resetTokenExpiry: { $gt: Date.now() },
+      resetTokenExpiry: {
+        $gt: Date.now(),
+      },
     });
 
     if (!admin) {
@@ -179,6 +220,7 @@ const resetPassword = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
+
     admin.password = await bcrypt.hash(password, salt);
 
     admin.resetToken = undefined;
@@ -186,10 +228,15 @@ const resetPassword = async (req, res) => {
 
     await admin.save();
 
-    res.status(200).json({ message: "Password reset successful" });
+    res.status(200).json({
+      message: "Password reset successful",
+    });
   } catch (error) {
     console.error("Reset Password Error:", error.message);
-    res.status(500).json({ error: "Server error" });
+
+    res.status(500).json({
+      error: "Server error",
+    });
   }
 };
 
